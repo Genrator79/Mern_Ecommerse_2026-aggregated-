@@ -8,49 +8,56 @@ import {
 } from "@/features/customer/products/product-list.shared";
 import type { CustomerProduct } from "@/features/customer/products/types";
 import { formatPrice } from "@/lib/utils";
+import { Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const cardClass =
-  "overflow-hidden border-border/60 bg-card/80 transition hover:border-primary/50";
+  "group overflow-hidden rounded-2xl border border-border/50 bg-card shadow-sm transition-all duration-300 hover:-translate-y-1 hover:border-primary/40 hover:shadow-xl hover:shadow-primary/5";
 
 const linkClass = "block";
 
-const imageWrapClass = "relative aspect-[4/5] bg-muted";
+const imageWrapClass = "relative aspect-[4/5] overflow-hidden bg-muted/40";
 
 const imageClass =
-  "h-full w-full object-cover transition duration-300 hover:scale-[1.02]";
+  "h-full w-full object-cover transition-transform duration-500 group-hover:scale-105";
+
+const imageOverlayClass =
+  "absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100";
+
+const quickViewClass =
+  "absolute bottom-3 left-1/2 -translate-x-1/2 flex items-center gap-1.5 rounded-full bg-white/90 px-4 py-1.5 text-xs font-semibold text-foreground shadow-md opacity-0 transition-all duration-300 group-hover:opacity-100 backdrop-blur-sm";
 
 const noImageClass =
   "flex h-full items-center justify-center text-sm text-muted-foreground";
 
 const saleBadgeClass =
-  "absolute left-3 top-3 border-primary/30 bg-secondary text-primary hover:bg-secondary";
+  "absolute right-3 top-3 rounded-full bg-primary px-2.5 py-0.5 text-[11px] font-bold text-primary-foreground shadow";
 
-const contentClass = "space-y-4 p-4";
+const contentClass = "space-y-3 p-4";
 
-const detailsWrapClass = "space-y-1";
+const detailsWrapClass = "space-y-0.5";
 
-const brandClass = "text-xs uppercase tracking-[0.18em] text-muted-foreground";
+const brandClass = "text-[10px] font-bold uppercase tracking-[0.2em] text-primary/70";
 
-const titleClass = "line-clamp-1 text-base font-semibold text-foreground";
+const titleClass = "line-clamp-1 text-sm font-semibold text-foreground transition-colors group-hover:text-primary";
 
-const categoryClass = "text-sm text-muted-foreground";
+const categoryClass = "text-xs text-muted-foreground";
 
-const priceRowClass = "flex items-center gap-2";
+const priceRowClass = "flex items-center gap-2 pt-0.5";
 
-const salePriceClass = "text-base font-semibold text-foreground";
+const salePriceClass = "text-base font-bold text-foreground";
 
-const originalPriceClass = "text-sm text-muted-foreground line-through";
+const originalPriceClass = "text-xs text-muted-foreground line-through";
 
-const colorsWrapClass = "flex items-center gap-2";
+const colorsWrapClass = "flex items-center gap-1.5";
 
-const colorSwatchClass = "h-4 w-4 border border-border";
+const colorSwatchClass = "h-3.5 w-3.5 rounded-full border border-border shadow-sm";
 
 const extraColorsClass = "text-xs text-muted-foreground";
 
-const footerClass = "flex items-center justify-between gap-3";
+const footerClass = "flex items-center justify-between gap-3 pt-1";
 
-const buttonClass = "rounded-none px-4";
+const buttonClass = "h-8 rounded-full px-4 text-xs font-semibold";
 
 type CustomerProductCardProps = {
   product: CustomerProduct;
@@ -71,6 +78,13 @@ function CustomerProductCard({ product }: CustomerProductCardProps) {
             <div className={noImageClass}>No Image</div>
           )}
 
+          {/* gradient overlay + quick-view pill */}
+          <div className={imageOverlayClass} />
+          <div className={quickViewClass}>
+            <Eye className="h-3.5 w-3.5" />
+            Quick View
+          </div>
+
           {hasSale ? (
             <Badge className={saleBadgeClass}>
               {product.salePercentage}% OFF
@@ -86,13 +100,15 @@ function CustomerProductCard({ product }: CustomerProductCardProps) {
           </div>
 
           <div className={priceRowClass}>
-            <span>{formatPrice(salePrice)}</span>
+            <span className={salePriceClass}>{formatPrice(salePrice)}</span>
             {hasSale ? (
               <span className={originalPriceClass}>
                 {formatPrice(product.price)}
               </span>
+
             ) : null}
           </div>
+
           {product.colors.length ? (
             <div className={colorsWrapClass}>
               {product.colors.slice(0, 4).map((color) => (

@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
-import { Loader2, UserPlus } from "lucide-react";
+import { Loader2, Store, UserPlus } from "lucide-react";
 
 export function SignUpPage() {
   const [name, setName] = useState("");
@@ -60,16 +60,21 @@ export function SignUpPage() {
   };
 
   return (
-    <div className="flex min-h-[75vh] items-center justify-center px-4 py-12">
-      <Card className="w-full max-w-md shadow-lg border-border/80">
-        <CardHeader className="space-y-1 text-center">
-          <CardTitle className="text-2xl font-bold tracking-tight">Create an Account</CardTitle>
-          <CardDescription>
-            Enter your information to register a new account
-          </CardDescription>
+    <div className="flex min-h-[75vh] items-center justify-center bg-gradient-to-br from-primary/5 via-background to-background px-4 py-12">
+      <Card className="w-full max-w-md border-border/60 shadow-2xl shadow-primary/5">
+        <CardHeader className="space-y-4 px-6 pb-4 pt-8 text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary ring-1 ring-primary/20">
+            <UserPlus className="h-6 w-6" />
+          </div>
+          <div className="space-y-1">
+            <CardTitle className="text-2xl font-bold tracking-tight">Create an Account</CardTitle>
+            <CardDescription>
+              Fill in the details below to get started
+            </CardDescription>
+          </div>
         </CardHeader>
         <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
+          <CardContent className="space-y-5 px-6 pb-2">
             <div className="space-y-2">
               <Label htmlFor="name">Full Name</Label>
               <Input
@@ -80,6 +85,7 @@ export function SignUpPage() {
                 onChange={(e) => setName(e.target.value)}
                 required
                 autoComplete="name"
+                className="h-11"
               />
             </div>
             <div className="space-y-2">
@@ -92,6 +98,7 @@ export function SignUpPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 required
                 autoComplete="email"
+                className="h-11"
               />
             </div>
             <div className="space-y-2">
@@ -99,11 +106,12 @@ export function SignUpPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="•••••••• (min. 6 characters)"
+                placeholder="Min. 6 characters"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 autoComplete="new-password"
+                className="h-11"
               />
             </div>
             <div className="space-y-2">
@@ -116,11 +124,12 @@ export function SignUpPage() {
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
                 autoComplete="new-password"
+                className="h-11"
               />
             </div>
           </CardContent>
-          <CardFooter className="flex flex-col gap-3">
-            <Button type="submit" className="w-full gap-2" disabled={loading}>
+          <CardFooter className="flex flex-col gap-3 px-6 pb-6 pt-4">
+            <Button type="submit" className="w-full gap-2 h-11" disabled={loading}>
               {loading ? (
                 <>
                   <Loader2 className="h-4 w-4 animate-spin" />

@@ -21,24 +21,26 @@ import {
 } from "@/components/ui/sheet";
 import type { ProductSort } from "@/features/customer/products/types";
 import { useCustomerProductList } from "@/features/customer/products/use-customer-collections";
-import { SlidersHorizontal, Search } from "lucide-react";
+import { SlidersHorizontal, Search, PackageSearch } from "lucide-react";
 
 const pageWrapClass = "min-h-screen bg-background";
 
 const heroSectionClass =
   "border-b border-border/60 bg-gradient-to-b from-primary/10 via-background to-background";
 
-const heroContainerClass = "mx-auto max-w-7xl px-4 py-10";
+const heroContainerClass = "mx-auto max-w-7xl px-4 py-14";
 
-const heroEyebrowClass = "text-sm uppercase tracking-[0.2em] text-primary";
+const heroEyebrowClass = "text-sm font-semibold uppercase tracking-[0.25em] text-primary";
 
 const heroContentClass =
-  "mt-3 flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between";
+  "mt-4 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between";
 
 const heroTitleWrapClass = "space-y-2";
 
 const heroTitleClass =
-  "text-3xl font-semibold tracking-tight text-foreground md:text-4xl";
+  "text-3xl font-bold tracking-tight text-foreground md:text-4xl";
+
+const heroSubtitleClass = "text-sm text-muted-foreground";
 
 const sortWrapClass = "flex items-center gap-3 text-sm text-muted-foreground";
 
@@ -77,7 +79,7 @@ const actionButtonClass = "rounded-none";
 const emptyCardClass = "border-border/60 bg-card/80";
 
 const emptyCardContentClass =
-  "flex min-h-60 flex-col items-center justify-center gap-4 p-6 text-center";
+  "flex min-h-72 flex-col items-center justify-center gap-5 p-8 text-center";
 
 const emptyTitleClass = "text-xl font-semibold text-foreground";
 
@@ -111,6 +113,11 @@ function Collections() {
           <div className={heroContentClass}>
             <div className={heroTitleWrapClass}>
               <h1 className={heroTitleClass}>Premium everyday essentials</h1>
+              <p className={heroSubtitleClass}>
+                {products.length > 0
+                  ? `${products.length} product${products.length !== 1 ? "s" : ""} available`
+                  : "Browse our curated selection"}
+              </p>
             </div>
 
             <div className={sortWrapClass}>
@@ -200,7 +207,17 @@ function Collections() {
             {!loading && !products.length ? (
               <Card className={emptyCardClass}>
                 <CardContent className={emptyCardContentClass}>
-                  <p className={emptyTitleClass}>No Products Found</p>
+                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+                    <PackageSearch className="h-8 w-8" />
+                  </div>
+                  <div className="space-y-1">
+                    <p className={emptyTitleClass}>No Products Found</p>
+                    <p className="text-sm text-muted-foreground">
+                      {hasActiveFilters
+                        ? "Try adjusting or clearing your filters"
+                        : "Check back soon for new arrivals"}
+                    </p>
+                  </div>
                   {hasActiveFilters ? (
                     <Button
                       onClick={clearFilters}

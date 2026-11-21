@@ -1,19 +1,21 @@
 import { Commonloader } from "@/components/common/Loader";
 import defaultHeroImage from "@/assets/hero.png";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCustomerHomeStore } from "@/features/customer/home/store";
 import { formatPrice } from "@/lib/utils";
-import { ArrowRight, Grid2X2, TicketPercent } from "lucide-react";
+import { ArrowRight, Grid2X2, ShoppingBag, TicketPercent } from "lucide-react";
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const pageWrapClass =
   "min-h-screen bg-background antialiased selection:bg-primary/20";
-const contentContainerClass = "mx-auto max-w-7xl px-4 py-0 sm:px-6 lg:px-8";
-const sectionStackClass = "space-y-18";
+const contentContainerClass = "mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8";
+const sectionStackClass = "space-y-16";
 
-const sectionHeadClass = "mb-10 space-y-3";
+const sectionHeadClass = "mb-10 flex items-end justify-between gap-4";
+const sectionHeadTextClass = "space-y-3";
 const sectionEyebrowClass =
   "text-xs font-bold uppercase tracking-[0.3em] text-primary/80";
 const sectionTitleClass =
@@ -24,6 +26,10 @@ const bannerMainCardClass =
   "group relative overflow-hidden rounded-[2rem] border border-border/30 bg-card shadow-xl transition-all duration-500 hover:shadow-2xl hover:shadow-primary/5";
 const bannerMainImageClass =
   "h-[540px] w-full object-cover transition-all duration-700 group-hover:scale-105";
+const bannerMainOverlayClass =
+  "absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent pointer-events-none";
+const bannerMainCTAClass =
+  "absolute bottom-8 left-8 right-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between";
 
 const bannerSideGridClass = "grid gap-6 sm:grid-cols-2 lg:grid-cols-1";
 const bannerSideCardClass =
@@ -111,6 +117,22 @@ export function StoreHome() {
                   alt="Feature Image"
                   className={bannerMainImageClass}
                 />
+                {/* Overlay gradient + CTA */}
+                <div className={bannerMainOverlayClass} />
+                <div className={bannerMainCTAClass}>
+                  <div className="space-y-1">
+                    <p className="text-xs font-bold uppercase tracking-[0.25em] text-white/70">New Arrivals</p>
+                    <h2 className="text-2xl font-semibold text-white drop-shadow-sm sm:text-3xl">
+                      Explore Our Collection
+                    </h2>
+                  </div>
+                  <Button asChild className="shrink-0 gap-2 rounded-full px-6 shadow-lg">
+                    <Link to="/collections">
+                      Shop Now
+                      <ShoppingBag className="h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </Card>
 
               {sideBanners.length ? (
@@ -132,8 +154,10 @@ export function StoreHome() {
           {!!data.categories.length ? (
             <section>
               <div className={sectionHeadClass}>
-                <p className={sectionEyebrowClass}>Categories</p>
-                <h2 className={sectionTitleClass}>Browse by collection</h2>
+                <div className={sectionHeadTextClass}>
+                  <p className={sectionEyebrowClass}>Categories</p>
+                  <h2 className={sectionTitleClass}>Browse by collection</h2>
+                </div>
               </div>
 
               <div className={categoryGridClass}>
@@ -168,8 +192,10 @@ export function StoreHome() {
           {!!data.coupons.length ? (
             <section>
               <div className={sectionHeadClass}>
-                <p className={sectionEyebrowClass}>Offers</p>
-                <h2 className={sectionTitleClass}>Live Coupon Cards</h2>
+                <div className={sectionHeadTextClass}>
+                  <p className={sectionEyebrowClass}>Offers</p>
+                  <h2 className={sectionTitleClass}>Live Coupon Cards</h2>
+                </div>
               </div>
 
               <div className={couponGridClass}>
@@ -197,8 +223,13 @@ export function StoreHome() {
           {!!data.recentProducts.length ? (
             <section>
               <div className={sectionHeadClass}>
-                <p className={sectionEyebrowClass}>Latest</p>
-                <h2 className={sectionTitleClass}>Recent Products</h2>
+                <div className={sectionHeadTextClass}>
+                  <p className={sectionEyebrowClass}>Latest</p>
+                  <h2 className={sectionTitleClass}>Recent Products</h2>
+                </div>
+                <Button asChild variant="outline" className="shrink-0 rounded-full px-5 text-sm">
+                  <Link to="/collections">View All <ArrowRight className="ml-1.5 h-4 w-4" /></Link>
+                </Button>
               </div>
               <div className={productGridClass}>
                 {data.recentProducts.slice(0, 4).map((product) => (
