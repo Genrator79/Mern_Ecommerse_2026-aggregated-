@@ -10,8 +10,8 @@ This document serves as the single source of truth for the project milestones, i
 | :--- | :--- | :---: | :---: | :--- |
 | **Milestone 1** | Environment Setup & Native Authentication Migration | `Completed` | ✅ Completed | Remove Clerk, implement native JWT + bcrypt, role-based auth |
 | **Milestone 2** | Product & Category Management + Cloudinary Integration | `Completed` | ✅ Completed | Admin CRUD, customer catalog, filters, search, Cloudinary uploads |
-| **Milestone 3** | Shopping Cart, Wishlist & Address Management | `Pending Approval` | ⏳ Awaiting | Guest/User cart sync, inventory validation, address CRUD |
-| **Milestone 4** | Backend Order Validation, Simulated Payment Engine & Atomic Stock | `Pending` | — | Server-side price & stock check, simulated payment (Success/Failure), atomic decrement |
+| **Milestone 3** | Shopping Cart, Wishlist & Address Management | `Completed` | ✅ Completed | Guest/User cart sync, inventory validation, address CRUD & selector |
+| **Milestone 4** | Backend Order Validation, Simulated Payment Engine & Atomic Stock | `Pending Approval` | ⏳ Awaiting | Server-side price & stock check, simulated payment (Success/Failure), atomic decrement |
 | **Milestone 5** | Order Confirmation, Customer Tracking/Returns & Admin Dashboard | `Pending` | — | Order confirmation, customer order history, returns, admin order status & dashboard stats |
 | **Milestone 6** | End-to-End System Testing & Final Acceptance Verification | `Pending` | — | Full testing across all flows, payment edge cases, clean builds |
 
@@ -75,19 +75,22 @@ This document serves as the single source of truth for the project milestones, i
 ---
 
 ### Milestone 3: Shopping Cart, Wishlist & Address Management
-- **Status**: `Pending`
+- **Status**: `Completed`
 - **Scope & Objectives**:
-  - [ ] Shopping Cart Backend:
-    - [ ] Endpoints for fetching cart, adding items, updating quantities, removing items, and clearing cart.
-    - [ ] Cart synchronization when guest user logs in.
-    - [ ] Live stock validation when adding/updating items.
-  - [ ] Shopping Cart Frontend:
-    - [ ] Cart drawer component with item list, quantity controls (`+` / `-`), remove button.
-    - [ ] Guest cart support via localStorage syncing upon sign-in.
-  - [ ] Customer Address Management:
-    - [ ] Address CRUD in profile (fullName, address, state, postalCode, isDefault).
-    - [ ] Address selector during checkout workflow.
-  - [ ] Wishlist verification and integration.
+  - [x] Shopping Cart Backend:
+    - [x] Endpoints for fetching cart, adding items, updating quantities, removing items, and clearing cart (`DELETE /cart`).
+    - [x] Cart synchronization when guest user logs in (`POST /cart/sync` bug fixes: batching outside loop & Cart.create).
+    - [x] Live stock validation when adding/updating items (stock check on add/increase).
+    - [x] Duplicate item prevention bug fix (`itemIndex >= 0`).
+  - [x] Shopping Cart Frontend:
+    - [x] Cart drawer component with item list, quantity controls (`+` / `-`), remove button, clear all button.
+    - [x] Guest cart support via localStorage syncing upon sign-in.
+    - [x] Open cart drawer upon adding to cart from product details.
+  - [x] Customer Address Management:
+    - [x] Address CRUD in profile (fullName, address, state, postalCode, isDefault).
+    - [x] Address selector during checkout workflow with quick management toggle.
+    - [x] Automatic address state synchronization between profile and checkout drawer.
+  - [x] Wishlist verification and integration (add, list, remove).
 - **Milestone 3 Acceptance Criteria**:
   - Cart operations (add/remove/quantity adjust) update correctly and reflect actual product availability.
   - Addresses can be created, edited, and selected for checkout.
@@ -166,4 +169,6 @@ This document serves as the single source of truth for the project milestones, i
 
 **Milestone 1 Completed**: Native authentication system successfully migrated and verified.
 **Milestone 2 Completed**: Product & category management, Cloudinary integration, and search/filtering completed and verified.
-**Currently Pending Approval**: `Milestone 3: Shopping Cart, Wishlist & Address Management`
+**UI Polish Committed** (`210a489`): Frontend aesthetic improvements — hero CTA overlay, product card hover effects + quick-view pill, rounded swatches, solid sale badge, sign-in/sign-up spacing fixes, Collections empty state icon. Pushed to `main`.
+**Milestone 3 Completed**: Shopping cart (CRUD, stock check, duplicate fix, guest sync, clear cart), wishlist, and customer address management (CRUD, checkout selector, real-time sync).
+**Currently Pending Approval**: `Milestone 4: Backend Order Validation, Simulated Payment Engine & Atomic Stock Processing`

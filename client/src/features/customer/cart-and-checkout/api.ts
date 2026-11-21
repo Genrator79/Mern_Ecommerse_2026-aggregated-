@@ -56,6 +56,10 @@ export async function removeCustomerCartItem(item: CustomerCartItemIdentifier) {
   return apiDelete<CustomerCartResponse>(buildCartItemUrl(item));
 }
 
+export async function clearCustomerCart() {
+  return apiDelete<CustomerCartResponse>("/customer/cart");
+}
+
 export async function syncCustomerCart(body: SyncCustomerCartBody) {
   return apiPost<CustomerCartResponse, SyncCustomerCartBody>(
     "/customer/cart/sync",

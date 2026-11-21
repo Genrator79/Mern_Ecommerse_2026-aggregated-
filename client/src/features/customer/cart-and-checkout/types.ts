@@ -13,6 +13,7 @@ export type CustomerCartItem = CustomerCartItemIdentifier & {
   image: string;
   finalPrice: number;
   quantity: number;
+  stock?: number;
 };
 
 export type CustomerCartResponse = {

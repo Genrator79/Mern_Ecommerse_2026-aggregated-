@@ -46,16 +46,27 @@ const emptyTitleClass = "text-base font-semibold text-foreground";
 function CustomerCartItems() {
   const { isSignedIn } = useAuth();
 
-  const { cart, setOpen, increase, decrease, remove } =
+  const { cart, setOpen, increase, decrease, remove, clearCart } =
     useCustomerCartAndCheckoutStore((state) => state);
 
   return (
     <div className={wrapClass}>
-      <div className={headClass}>
+      <div className="flex items-center justify-between border-b border-border bg-primary/5 px-5 py-4">
         <p className={headingTextClass}>
           <ShoppingCart className={headingIconClass} />
-          Your Cart
+          Your Cart {cart.totalQuantity > 0 ? `(${cart.totalQuantity})` : ""}
         </p>
+        {cart.items.length > 0 ? (
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+            onClick={() => void clearCart(Boolean(isSignedIn))}
+          >
+            Clear All
+          </Button>
+        ) : null}
       </div>
 
       <ScrollArea className={scrollClass}>

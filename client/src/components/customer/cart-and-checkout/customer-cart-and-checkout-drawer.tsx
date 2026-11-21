@@ -6,6 +6,7 @@ import {
   DrawerTitle,
 } from "@/components/ui/drawer";
 import { useCustomerCartAndCheckoutStore } from "@/features/customer/cart-and-checkout/store";
+import { useCustomerProfileStore } from "@/features/customer/profile/store";
 import CustomerCartItems from "./customer-cart-items";
 import { useEffect } from "react";
 import { useAuthStore } from "@/features/auth/store";
@@ -13,7 +14,15 @@ import { useAuth, useUser } from "@/features/auth/store";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { formatPrice } from "@/lib/utils";
+import { MapPin, Plus } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const contentClass =
@@ -67,11 +76,13 @@ function CustomerCartAndCheckoutDrawer() {
   const { isLoaded, isSignedIn } = useAuth();
   const { user } = useUser();
   const navigate = useNavigate();
+  const { openProfile } = useCustomerProfileStore();
   const {
     isOpen,
     setOpen,
     loadCart,
     selectedAddressId,
+    setSelectedAddressId,
     addresses,
     promoInput,
     appliedPromo,
@@ -128,27 +139,71 @@ function CustomerCartAndCheckoutDrawer() {
                   <>
                     <ScrollArea className={scrollClass}>
                       <div className={bodyClass}>
-                        <section className="space-y-2">
-                          <p className={sectionTitleClass}>Default Address</p>
+                        <section className="space-y-3">
+                          <div className="flex items-center justify-between">
+                            <p className={sectionTitleClass}>Delivery Address</p>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="sm"
+                              className="h-7 px-2 text-xs text-primary hover:text-primary/80"
+                              onClick={() => {
+                                setOpen(false);
+                                void openProfile();
+                              }}
+                            >
+                              Manage
+                            </Button>
+                          </div>
+
+                          {addresses.length > 1 ? (
+                            <Select
+                              value={selectedAddressId}
+                              onValueChange={(val) => setSelectedAddressId(val)}
+                            >
+                              <SelectTrigger className="w-full bg-background/50 text-xs">
+                                <SelectValue placeholder="Choose delivery address" />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {addresses.map((addr) => (
+                                  <SelectItem key={addr._id} value={addr._id} className="text-xs">
+                                    {addr.fullName} — {addr.address}, {addr.state} ({addr.postalCode}){addr.isDefault ? " [Default]" : ""}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : null}
 
                           {selectedAddress ? (
                             <div className={cardClass}>
+                              <div className="flex items-center justify-between">
+                                <p className="font-medium text-foreground text-xs">{selectedAddress.fullName}</p>
+                                {selectedAddress.isDefault ? (
+                                  <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">Default</span>
+                                ) : null}
+                              </div>
                               <p className={helperClass}>
-                                {selectedAddress.fullName}
-                              </p>
-                              <p className={helperClass}>
-                                {selectedAddress.address}
-                                {selectedAddress.state}
-                              </p>
-                              <p className={helperClass}>
-                                {selectedAddress.postalCode}
+                                {selectedAddress.address}, {selectedAddress.state} {selectedAddress.postalCode}
                               </p>
                             </div>
                           ) : (
-                            <p>
-                              No default address present. Add one from profile
-                              dialog
-                            </p>
+                            <div className="rounded-xl border border-dashed border-border p-4 text-center space-y-2">
+                              <MapPin className="mx-auto h-5 w-5 text-muted-foreground" />
+                              <p className="text-xs text-muted-foreground">No delivery address saved</p>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                className="h-8 gap-1.5 text-xs rounded-full"
+                                onClick={() => {
+                                  setOpen(false);
+                                  void openProfile();
+                                }}
+                              >
+                                <Plus className="h-3.5 w-3.5" />
+                                Add Address
+                              </Button>
+                            </div>
                           )}
                         </section>
 

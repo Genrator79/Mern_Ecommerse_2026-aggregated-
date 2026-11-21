@@ -148,5 +148,6 @@ export const useCustomerProductDetailsStore =
         },
         isSignedIn,
       );
+      useCustomerCartAndCheckoutStore.getState().setOpen(true);
     },
   }));

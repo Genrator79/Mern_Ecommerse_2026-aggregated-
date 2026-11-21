@@ -11,6 +11,7 @@ import type {
 import {
   addCustomerCartItem,
   applyCustomerPromo,
+  clearCustomerCart,
   confirmCheckout,
   createCheckoutSession,
   decreaseCustomerCartItem,
@@ -55,6 +56,7 @@ type CustomerCartAndCheckoutStore = {
   pointsCheckoutLoading: boolean;
   setOpen: (value: boolean) => void;
   setCart: (cart: CustomerCartResponse) => void;
+  setSelectedAddressId: (id: string) => void;
   loadCart: (isSignedIn: boolean) => Promise<void>;
   addItem: (item: AddCartItemInput, isSignedIn: boolean) => Promise<void>;
   increase: (
@@ -69,6 +71,7 @@ type CustomerCartAndCheckoutStore = {
     item: CustomerCartItemIdentifier,
     isSignedIn: boolean,
   ) => Promise<void>;
+  clearCart: (isSignedIn: boolean) => Promise<void>;
   setPromoInput: (value: string) => void;
   clearPromo: () => void;
   applyPromo: () => Promise<void>;
@@ -246,6 +249,7 @@ export const useCustomerCartAndCheckoutStore =
     ...defaultUiState,
     setOpen: (value) => set({ isOpen: value }),
     setCart: (cart) => set({ cart }),
+    setSelectedAddressId: (id) => set({ selectedAddressId: id }),
     loadCart: async (isSignedIn) => {
       try {
         set({ loading: true });
@@ -354,6 +358,20 @@ export const useCustomerCartAndCheckoutStore =
         toast.success("Cart item removed");
       } catch {
         toast.error("Failed to remove from cart");
+      }
+    },
+    clearCart: async (isSignedIn) => {
+      try {
+        if (isSignedIn) {
+          const response = await clearCustomerCart();
+          set({ cart: response ?? emptyCart });
+        } else {
+          clearGuestItems();
+          set({ cart: emptyCart });
+        }
+        toast.success("Cart cleared");
+      } catch {
+        toast.error("Failed to clear cart");
       }
     },
     setPromoInput: (value) => set({ promoInput: value }),

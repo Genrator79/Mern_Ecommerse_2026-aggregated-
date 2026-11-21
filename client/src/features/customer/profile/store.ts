@@ -6,6 +6,7 @@ import {
   getCustomerAddresses,
   updateCustomerAddresses,
 } from "./api";
+import { useCustomerCartAndCheckoutStore } from "../cart-and-checkout/store";
 import { toast } from "sonner";
 
 const emptyForm: CustomerAddressFormValues = {
@@ -119,11 +120,23 @@ export const useCustomerProfileStore = create<CustomerProfileStore>(
             ? await updateCustomerAddresses(editingAddressId, payload)
             : await createCustomerAddresses(payload);
 
+        const items = response?.items ?? [];
         set({
-          items: response?.items ?? [],
+          items,
           mode: "none",
           editingAddressId: "",
           form: emptyForm,
+        });
+
+        const checkoutStore = useCustomerCartAndCheckoutStore.getState();
+        const defaultAddr = items.find((i) => i.isDefault) || items[0] || null;
+        useCustomerCartAndCheckoutStore.setState({
+          addresses: items,
+          selectedAddressId:
+            checkoutStore.selectedAddressId &&
+            items.some((i) => i._id === checkoutStore.selectedAddressId)
+              ? checkoutStore.selectedAddressId
+              : (defaultAddr?._id ?? ""),
         });
 
         toast.success(mode === "edit" ? "Address updated" : "Address created");
@@ -136,13 +149,25 @@ export const useCustomerProfileStore = create<CustomerProfileStore>(
       try {
         const response = await deleteCustomerAddress(addressId);
 
+        const items = response?.items ?? [];
         set((state) => ({
-          items: response?.items ?? [],
+          items,
           mode: state.editingAddressId === addressId ? "none" : state.mode,
           editingAddressId:
             state.editingAddressId === addressId ? "" : state.editingAddressId,
           form: state.editingAddressId === addressId ? emptyForm : state.form,
         }));
+
+        const checkoutStore = useCustomerCartAndCheckoutStore.getState();
+        const defaultAddr = items.find((i) => i.isDefault) || items[0] || null;
+        useCustomerCartAndCheckoutStore.setState({
+          addresses: items,
+          selectedAddressId:
+            checkoutStore.selectedAddressId &&
+            items.some((i) => i._id === checkoutStore.selectedAddressId)
+              ? checkoutStore.selectedAddressId
+              : (defaultAddr?._id ?? ""),
+        });
 
         toast.success("Address deleted successfully");
       } catch {
