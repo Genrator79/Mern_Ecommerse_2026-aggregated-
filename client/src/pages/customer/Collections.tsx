@@ -4,6 +4,7 @@ import CustomerProductCard from "@/components/customer/products/customer-product
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
@@ -20,7 +21,7 @@ import {
 } from "@/components/ui/sheet";
 import type { ProductSort } from "@/features/customer/products/types";
 import { useCustomerProductList } from "@/features/customer/products/use-customer-collections";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, Search } from "lucide-react";
 
 const pageWrapClass = "min-h-screen bg-background";
 
@@ -86,6 +87,8 @@ function Collections() {
   const {
     sort,
     changeSort,
+    search,
+    changeSearch,
     loading,
     products,
     hasActiveFilters,
@@ -111,6 +114,17 @@ function Collections() {
             </div>
 
             <div className={sortWrapClass}>
+              <div className="relative w-56 sm:w-64">
+                <Input
+                  type="search"
+                  placeholder="Search products..."
+                  value={search}
+                  onChange={(e) => changeSearch(e.target.value)}
+                  className="rounded-none bg-card h-10 pl-9"
+                />
+                <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+              </div>
+
               <Select
                 value={sort}
                 onValueChange={(value) => changeSort(value as ProductSort)}

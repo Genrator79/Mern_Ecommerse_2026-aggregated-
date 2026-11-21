@@ -71,6 +71,16 @@ adminProductRouter.put(
   }),
 );
 
+adminProductRouter.delete(
+  "/categories/:id",
+  asyncHandler(async (req: Request, res: Response) => {
+    const extractCategoryId = req.params.id as string;
+    const category = await Category.findByIdAndDelete(extractCategoryId);
+    requireFound(category, "Category not found", 404);
+    res.json(ok({ message: "Category deleted successfully" }));
+  }),
+);
+
 // products
 adminProductRouter.get(
   "/products",
@@ -273,5 +283,37 @@ adminProductRouter.put(
     );
 
     res.json(ok(updatedProduct));
+  }),
+);
+
+adminProductRouter.delete(
+  "/products/:id",
+  asyncHandler(async (req: Request, res: Response) => {
+    const productId = req.params.id as string;
+    const product = await Product.findByIdAndDelete(productId);
+    requireFound(product, "Product not found", 404);
+    res.json(ok({ message: "Product deleted successfully" }));
+  }),
+);
+
+adminProductRouter.patch(
+  "/products/:id/stock",
+  asyncHandler(async (req: Request, res: Response) => {
+    const productId = req.params.id as string;
+    const stock = Number(req.body.stock);
+    requireNumber(stock, "Stock is required");
+
+    if (stock < 0) {
+      throw new AppError(400, "Stock cannot be negative");
+    }
+
+    const product = await Product.findByIdAndUpdate(
+      productId,
+      { $set: { stock } },
+      { new: true },
+    ).populate("category", "name");
+
+    requireFound(product, "Product not found", 404);
+    res.json(ok(product));
   }),
 );

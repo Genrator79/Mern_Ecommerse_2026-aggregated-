@@ -14,6 +14,7 @@ type ProductAppliedFilterListQuery = {
   brand?: string;
   color?: string;
   size?: string;
+  search?: string;
   sort?: ProductSort;
 };
 
@@ -39,11 +40,20 @@ customerProductRouter.get(
       const brand = (req.query.brand || "").trim();
       const color = (req.query.color || "").trim();
       const size = (req.query.size || "").trim();
+      const search = (req.query.search || "").trim();
       const sort: ProductSort = req.query.sort || "recent";
 
       const query: Record<string, unknown> = {
         status: "active",
       };
+
+      if (search) {
+        query.$or = [
+          { title: { $regex: search, $options: "i" } },
+          { brand: { $regex: search, $options: "i" } },
+          { description: { $regex: search, $options: "i" } },
+        ];
+      }
 
       if (category) {
         query.category = category;

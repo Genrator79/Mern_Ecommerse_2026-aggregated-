@@ -33,17 +33,29 @@ export function useCustomerProductList() {
   );
 
   const sort = (searchParams.get("sort") as ProductSort) || "recent";
+  const search = searchParams.get("search") || "";
 
   const query = useMemo<GetCustomerProductsParams>(
     () => ({
       category: filters.category || undefined,
       brand: filters.brand || undefined,
       color: filters.color || undefined,
+      search: search || undefined,
       sort,
       size: filters.size || undefined,
     }),
-    [filters, sort],
+    [filters, search, sort],
   );
+
+  function changeSearch(value: string) {
+    const next = new URLSearchParams(searchParams);
+    if (value.trim()) {
+      next.set("search", value.trim());
+    } else {
+      next.delete("search");
+    }
+    setSearchParams(next);
+  }
 
   const hasActiveFilters = Boolean(
     filters.category || filters.brand || filters.color || filters.size,
@@ -197,6 +209,8 @@ export function useCustomerProductList() {
     loading,
     filters,
     sort,
+    search,
+    changeSearch,
     hasActiveFilters,
     changeSort,
     availableColors,

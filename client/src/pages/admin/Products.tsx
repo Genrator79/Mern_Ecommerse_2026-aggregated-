@@ -31,6 +31,7 @@ function AdminProducts() {
     closeProductDialog,
     refreshAll,
     openEditDialog,
+    deleteProduct,
   } = useAdminProducts();
 
   return (
@@ -50,6 +51,7 @@ function AdminProducts() {
             loading={loading}
             products={products}
             onEdit={openEditDialog}
+            onDelete={deleteProduct}
           />
         </CardContent>
       </Card>

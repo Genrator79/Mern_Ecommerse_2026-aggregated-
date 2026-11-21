@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from "react";
 import type { Category, Product } from "./types";
-import { getAdminCategories, getAdminProducts } from "./api";
+import { deleteAdminProduct, getAdminCategories, getAdminProducts } from "./api";
 
 export function useAdminProducts() {
   const [search, setSearch] = useState("");
@@ -44,6 +44,11 @@ export function useAdminProducts() {
     setEditingProduct(null);
   }
 
+  async function deleteProduct(productId: string) {
+    await deleteAdminProduct(productId);
+    await loadProducts(search);
+  }
+
   const refreshAll = useCallback(async () => {
     await Promise.all([loadCategories(), loadProducts(search)]);
   }, [loadCategories, loadProducts, search]);
@@ -75,5 +80,6 @@ export function useAdminProducts() {
     openCreateDialog,
     closeProductDialog,
     openEditDialog,
+    deleteProduct,
   };
 }

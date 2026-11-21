@@ -9,8 +9,8 @@ This document serves as the single source of truth for the project milestones, i
 | Milestone | Title | Status | Approval | Notes |
 | :--- | :--- | :---: | :---: | :--- |
 | **Milestone 1** | Environment Setup & Native Authentication Migration | `Completed` | ✅ Completed | Remove Clerk, implement native JWT + bcrypt, role-based auth |
-| **Milestone 2** | Product & Category Management + Cloudinary Integration | `Pending Approval` | ⏳ Awaiting | Admin CRUD, customer catalog, filters, search, Cloudinary uploads |
-| **Milestone 3** | Shopping Cart, Wishlist & Address Management | `Pending` | — | Guest/User cart sync, inventory validation, address CRUD |
+| **Milestone 2** | Product & Category Management + Cloudinary Integration | `Completed` | ✅ Completed | Admin CRUD, customer catalog, filters, search, Cloudinary uploads |
+| **Milestone 3** | Shopping Cart, Wishlist & Address Management | `Pending Approval` | ⏳ Awaiting | Guest/User cart sync, inventory validation, address CRUD |
 | **Milestone 4** | Backend Order Validation, Simulated Payment Engine & Atomic Stock | `Pending` | — | Server-side price & stock check, simulated payment (Success/Failure), atomic decrement |
 | **Milestone 5** | Order Confirmation, Customer Tracking/Returns & Admin Dashboard | `Pending` | — | Order confirmation, customer order history, returns, admin order status & dashboard stats |
 | **Milestone 6** | End-to-End System Testing & Final Acceptance Verification | `Pending` | — | Full testing across all flows, payment edge cases, clean builds |
@@ -55,19 +55,19 @@ This document serves as the single source of truth for the project milestones, i
 ---
 
 ### Milestone 2: Product & Category Management with Cloudinary Integration
-- **Status**: `Pending`
+- **Status**: `Completed`
 - **Scope & Objectives**:
-  - [ ] Category Management (Admin):
-    - [ ] Category listing, creation, and updating.
-  - [ ] Product Management (Admin):
-    - [ ] Product creation with title, description, category, brand, stock, price, sale percentage, sizes, colors.
-    - [ ] Product update and deletion.
-    - [ ] Cloudinary image upload via buffer (`uploadManyBuffersToCloudinary`) using existing Cloudinary env variables.
-    - [ ] Stock and inventory editing.
-  - [ ] Customer Catalog:
-    - [ ] Product listing with category filtering, brand filtering, color/size filtering, and sorting (price, recency).
-    - [ ] Product search functionality.
-    - [ ] Product details page with image gallery, size/color selectors, and stock indicator.
+  - [x] Category Management (Admin):
+    - [x] Category listing, creation, updating, and deletion (`/admin/categories`).
+  - [x] Product Management (Admin):
+    - [x] Product creation with title, description, category, brand, stock, price, sale percentage, sizes, colors.
+    - [x] Product update and deletion (`DELETE /admin/products/:id`).
+    - [x] Cloudinary image upload pipeline (`uploadManyBuffersToCloudinary`) with graceful local fallback buffer handling.
+    - [x] Stock and inventory editing (`PATCH /admin/products/:id/stock`).
+  - [x] Customer Catalog:
+    - [x] Product listing with category filtering, brand filtering, color/size filtering, and sorting (price, recency).
+    - [x] Product search functionality across title, brand, and description.
+    - [x] Product details page with image gallery, size/color selectors, and stock indicator.
 - **Milestone 2 Acceptance Criteria**:
   - Admin can manage categories and products with images uploaded to Cloudinary.
   - Customer can browse, search, and view product details accurately.
@@ -165,4 +165,5 @@ This document serves as the single source of truth for the project milestones, i
 ## Current Execution Focus
 
 **Milestone 1 Completed**: Native authentication system successfully migrated and verified.
-**Currently Pending Approval**: `Milestone 2: Product & Category Management with Cloudinary Integration`
+**Milestone 2 Completed**: Product & category management, Cloudinary integration, and search/filtering completed and verified.
+**Currently Pending Approval**: `Milestone 3: Shopping Cart, Wishlist & Address Management`

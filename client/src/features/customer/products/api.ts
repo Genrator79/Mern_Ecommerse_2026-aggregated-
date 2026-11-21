@@ -33,6 +33,10 @@ export async function getCustomerProducts(params?: GetCustomerProductsParams) {
     searchParams.set("sort", params.sort);
   }
 
+  if (params?.search) {
+    searchParams.set("search", params.search);
+  }
+
   const queryString = searchParams.toString();
 
   const url = queryString

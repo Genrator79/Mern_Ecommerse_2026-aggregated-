@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/table";
 import type { Product } from "@/features/admin/products/types";
 import { getCoverImage } from "@/features/admin/products/use-product-form";
-import { Pencil } from "lucide-react";
+import { Pencil, Trash2 } from "lucide-react";
 
 const wrapperClass = "overflow-x-auto rounded-xl border border-border";
 
@@ -40,12 +40,14 @@ const editIconClass = "h-4 w-4";
 type ProductsTableProps = {
   products: Product[];
   onEdit: (product: Product) => void;
+  onDelete?: (productId: string) => void;
   loading: boolean;
 };
 
 export function ProductsTable({
   products,
   onEdit,
+  onDelete,
   loading,
 }: ProductsTableProps) {
   return (
@@ -113,9 +115,25 @@ export function ProductsTable({
                         size={"icon"}
                         variant="ghost"
                         onClick={() => onEdit(product)}
+                        title="Edit product"
                       >
                         <Pencil className={editIconClass} />
                       </Button>
+                      {onDelete ? (
+                        <Button
+                          size={"icon"}
+                          variant="ghost"
+                          onClick={() => {
+                            if (window.confirm(`Are you sure you want to delete "${product.title}"?`)) {
+                              onDelete(product._id);
+                            }
+                          }}
+                          className="text-destructive hover:text-destructive"
+                          title="Delete product"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      ) : null}
                     </div>
                   </TableCell>
                 </TableRow>

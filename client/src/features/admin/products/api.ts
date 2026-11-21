@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPut } from "@/lib/api";
+import { apiDelete, apiGet, apiPatch, apiPost, apiPut } from "@/lib/api";
 import type {
   Category,
   CreateCategoryBody,
@@ -88,4 +88,18 @@ export async function updateAdminProduct(
   const formData = buildProductFormData(body, files);
 
   return apiPut<Product, FormData>(`/admin/products/${productId}`, formData);
+}
+
+export async function deleteAdminProduct(productId: string) {
+  return apiDelete<{ message: string }>(`/admin/products/${productId}`);
+}
+
+export async function deleteAdminCategory(categoryId: string) {
+  return apiDelete<{ message: string }>(`/admin/categories/${categoryId}`);
+}
+
+export async function updateAdminProductStock(productId: string, stock: number) {
+  return apiPatch<Product, { stock: number }>(`/admin/products/${productId}/stock`, {
+    stock,
+  });
 }
