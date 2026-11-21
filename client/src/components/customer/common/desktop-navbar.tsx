@@ -99,7 +99,7 @@ function NavTextLink({
 
 export function CustomerNavbar() {
   const { isSignedIn, signOut, isLoaded } = useAuth();
-  const { isBootstrapped } = useAuthStore();
+  const { isBootstrapped, user } = useAuthStore();
 
   const {
     items: wishlistItems,
@@ -183,6 +183,15 @@ export function CustomerNavbar() {
                 align="start"
                 className={accountDropdownContent}
               >
+                {user?.role === "admin" ? (
+                  <DropdownMenuItem asChild className={dropdownItemLink}>
+                    <Link to="/admin">
+                      <Store className="h-4 w-4 text-primary" />
+                      <span>Admin Dashboard</span>
+                    </Link>
+                  </DropdownMenuItem>
+                ) : null}
+
                 <DropdownMenuItem
                   onClick={() => void openProfile()}
                   className={dropdownItemLink}

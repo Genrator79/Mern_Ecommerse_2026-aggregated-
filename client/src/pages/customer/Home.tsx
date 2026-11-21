@@ -1,4 +1,5 @@
 import { Commonloader } from "@/components/common/Loader";
+import defaultHeroImage from "@/assets/hero.png";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { useCustomerHomeStore } from "@/features/customer/home/store";
@@ -95,7 +96,7 @@ export function StoreHome() {
     return <Commonloader />;
   }
 
-  const mainBanner = data.banners[0] || null;
+  const mainBannerImage = data.banners[0]?.imageUrl || defaultHeroImage;
   const sideBanners = data.banners.slice(1, 3);
 
   return (
@@ -103,26 +104,28 @@ export function StoreHome() {
       <div className={contentContainerClass}>
         <div className={sectionStackClass}>
           <section>
-            <div className={bannerGridClass}>
+            <div className={sideBanners.length ? bannerGridClass : "w-full"}>
               <Card className={bannerMainCardClass}>
                 <img
-                  src={mainBanner.imageUrl}
+                  src={mainBannerImage}
                   alt="Feature Image"
                   className={bannerMainImageClass}
                 />
               </Card>
 
-              <div className={bannerSideGridClass}>
-                {sideBanners.map((item) => (
-                  <Card key={item._id} className={bannerSideCardClass}>
-                    <img
-                      src={item.imageUrl}
-                      alt="Feature Image"
-                      className={bannerSideImageClass}
-                    />
-                  </Card>
-                ))}
-              </div>
+              {sideBanners.length ? (
+                <div className={bannerSideGridClass}>
+                  {sideBanners.map((item) => (
+                    <Card key={item._id} className={bannerSideCardClass}>
+                      <img
+                        src={item.imageUrl}
+                        alt="Feature Image"
+                        className={bannerSideImageClass}
+                      />
+                    </Card>
+                  ))}
+                </div>
+              ) : null}
             </div>
           </section>
 
@@ -135,7 +138,10 @@ export function StoreHome() {
 
               <div className={categoryGridClass}>
                 {data.categories.slice(0, 4).map((categoryItem) => (
-                  <Link to={`/collections?category=${categoryItem._id}`}>
+                  <Link
+                    key={categoryItem._id}
+                    to={`/collections?category=${categoryItem._id}`}
+                  >
                     <Card className={categoryCardClass}>
                       <CardContent className={categoryContentClass}>
                         <div className={categoryIconWrapClass}>
@@ -168,7 +174,7 @@ export function StoreHome() {
 
               <div className={couponGridClass}>
                 {data.coupons.slice(0, 4).map((coupon) => (
-                  <Card className={couponCardClass}>
+                  <Card key={coupon._id || coupon.code} className={couponCardClass}>
                     <CardContent className={couponContentClass}>
                       <div className={couponIconWrapClass}>
                         <TicketPercent className={couponIconClass} />
