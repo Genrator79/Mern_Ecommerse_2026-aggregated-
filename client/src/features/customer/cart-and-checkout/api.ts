@@ -9,6 +9,7 @@ import type {
   CheckoutSessionResponse,
   CustomerCartItemIdentifier,
   CustomerCartResponse,
+  SimulatePaymentResponse,
   SyncCustomerCartBody,
 } from "./types";
 import { getCustomerAddresses } from "../profile/api";
@@ -134,6 +135,16 @@ export async function confirmCheckout(body: {
 }) {
   return apiPost<CheckoutConfirmResponse, typeof body>(
     "/customer/checkout/confirm",
+    body,
+  );
+}
+
+export async function simulatePayment(body: {
+  orderId: string;
+  status: "success" | "failure";
+}) {
+  return apiPost<SimulatePaymentResponse, typeof body>(
+    "/customer/checkout/simulate-payment",
     body,
   );
 }

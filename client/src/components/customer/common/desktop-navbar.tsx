@@ -27,6 +27,7 @@ import { useCustomerProfileStore } from "@/features/customer/profile/store";
 import CustomerProfileDialog from "../profile/customer-profile-dialog";
 import { useCustomerCartAndCheckoutStore } from "@/features/customer/cart-and-checkout/store";
 import CustomerCartAndCheckoutDrawer from "../cart-and-checkout/customer-cart-and-checkout-drawer";
+import CustomerPaymentSimulationDialog from "../cart-and-checkout/customer-payment-simulation-dialog";
 import { useCustomerOrdersStore } from "@/features/customer/orders/store";
 import CustomerOrdersDialog from "../orders/customer-orders-dialog";
 
@@ -233,6 +234,7 @@ export function CustomerNavbar() {
         {showSignInUi ? <CustomerProfileDialog /> : null}
         {showSignInUi ? <CustomerOrdersDialog /> : null}
         <CustomerCartAndCheckoutDrawer />
+        <CustomerPaymentSimulationDialog />
       </div>
     </header>
   );

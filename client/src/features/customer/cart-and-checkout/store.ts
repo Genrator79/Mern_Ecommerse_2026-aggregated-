@@ -19,6 +19,7 @@ import {
   increaseCustomerCartItem,
   payWithPointsCheckout,
   removeCustomerCartItem,
+  simulatePayment,
   syncCustomerCart,
 } from "./api";
 import { toast } from "sonner";
@@ -42,6 +43,16 @@ type PointsArgs = {
   onSuccess: () => void;
 };
 
+export type SimulationDialogState = {
+  isOpen: boolean;
+  orderId: string;
+  amount: number;
+  totalItems: number;
+  deliveryName: string;
+  deliveryAddress: string;
+  onSuccess?: () => void;
+};
+
 type CustomerCartAndCheckoutStore = {
   cart: CustomerCartResponse;
   isOpen: boolean;
@@ -54,7 +65,9 @@ type CustomerCartAndCheckoutStore = {
   promoLoading: boolean;
   checkoutLoading: boolean;
   pointsCheckoutLoading: boolean;
+  simulation: SimulationDialogState;
   setOpen: (value: boolean) => void;
+  setSimulationOpen: (value: boolean) => void;
   setCart: (cart: CustomerCartResponse) => void;
   setSelectedAddressId: (id: string) => void;
   loadCart: (isSignedIn: boolean) => Promise<void>;
@@ -76,6 +89,7 @@ type CustomerCartAndCheckoutStore = {
   clearPromo: () => void;
   applyPromo: () => Promise<void>;
   startRazorpayCheckout: (args: RazorpayArgs) => Promise<void>;
+  processSimulatedPayment: (status: "success" | "failure") => Promise<void>;
   startPointsCheckout: (args: PointsArgs) => Promise<void>;
   clear: () => void;
 };
@@ -83,6 +97,15 @@ type CustomerCartAndCheckoutStore = {
 const emptyCart: CustomerCartResponse = {
   items: [],
   totalQuantity: 0,
+};
+
+const defaultSimulationState: SimulationDialogState = {
+  isOpen: false,
+  orderId: "",
+  amount: 0,
+  totalItems: 0,
+  deliveryName: "",
+  deliveryAddress: "",
 };
 
 const defaultUiState = {
@@ -95,6 +118,7 @@ const defaultUiState = {
   promoLoading: false,
   checkoutLoading: false,
   pointsCheckoutLoading: false,
+  simulation: defaultSimulationState,
 };
 
 function waitForRazorpay(timeOut = 4000): Promise<void> {
@@ -248,6 +272,8 @@ export const useCustomerCartAndCheckoutStore =
     isOpen: false,
     ...defaultUiState,
     setOpen: (value) => set({ isOpen: value }),
+    setSimulationOpen: (value) =>
+      set((s) => ({ simulation: { ...s.simulation, isOpen: value } })),
     setCart: (cart) => set({ cart }),
     setSelectedAddressId: (id) => set({ selectedAddressId: id }),
     loadCart: async (isSignedIn) => {
@@ -446,17 +472,59 @@ export const useCustomerCartAndCheckoutStore =
           promoCode: appliedPromo?.code || undefined,
         });
 
-        if (
-          !session.razorpay?.keyId ||
-          !session.razorpay.orderId ||
-          !session.order._id
-        ) {
+        if (!session.order?._id) {
           throw new Error("Invalid checkout session");
         }
 
-        //load the razorpay instance
+        const isSimulated =
+          session.mode === "simulated" ||
+          !session.razorpay?.keyId ||
+          session.razorpay.keyId === "rzp_test_simulated";
 
-        await waitForRazorpay();
+        if (isSimulated) {
+          const { addresses } = get();
+          const selectedAddr = addresses.find((a) => a._id === selectedAddressId);
+          set({
+            isOpen: false,
+            checkoutLoading: false,
+            simulation: {
+              isOpen: true,
+              orderId: session.order._id,
+              amount: session.order.totalAmount,
+              totalItems: session.order.totalItems,
+              deliveryName: selectedAddr?.fullName || name,
+              deliveryAddress: selectedAddr
+                ? `${selectedAddr.address}, ${selectedAddr.state} ${selectedAddr.postalCode}`
+                : "",
+              onSuccess,
+            },
+          });
+          return;
+        }
+
+        // Try Razorpay flow, fallback to simulation if SDK not available
+        try {
+          await waitForRazorpay();
+        } catch {
+          const { addresses } = get();
+          const selectedAddr = addresses.find((a) => a._id === selectedAddressId);
+          set({
+            isOpen: false,
+            checkoutLoading: false,
+            simulation: {
+              isOpen: true,
+              orderId: session.order._id,
+              amount: session.order.totalAmount,
+              totalItems: session.order.totalItems,
+              deliveryName: selectedAddr?.fullName || name,
+              deliveryAddress: selectedAddr
+                ? `${selectedAddr.address}, ${selectedAddr.state} ${selectedAddr.postalCode}`
+                : "",
+              onSuccess,
+            },
+          });
+          return;
+        }
 
         if (!window.Razorpay) {
           throw new Error("Razorpay not loaded");
@@ -504,6 +572,38 @@ export const useCustomerCartAndCheckoutStore =
       } catch {
         set({ checkoutLoading: false });
         toast.error("Unable to start checkout");
+      }
+    },
+
+    processSimulatedPayment: async (status: "success" | "failure") => {
+      const { simulation } = get();
+      if (!simulation.orderId) return;
+
+      try {
+        set({ checkoutLoading: true });
+        const res = await simulatePayment({
+          orderId: simulation.orderId,
+          status,
+        });
+
+        if (status === "success" && res.paymentStatus === "paid") {
+          set({
+            cart: emptyCart,
+            simulation: defaultSimulationState,
+            checkoutLoading: false,
+          });
+          toast.success("Payment successful! Order confirmed.");
+          simulation.onSuccess?.();
+        } else {
+          set({
+            simulation: defaultSimulationState,
+            checkoutLoading: false,
+          });
+          toast.error("Payment failed or cancelled. Your cart remains intact.");
+        }
+      } catch (err) {
+        set({ checkoutLoading: false });
+        toast.error("Payment processing error");
       }
     },
 

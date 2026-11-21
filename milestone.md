@@ -11,8 +11,8 @@ This document serves as the single source of truth for the project milestones, i
 | **Milestone 1** | Environment Setup & Native Authentication Migration | `Completed` | ✅ Completed | Remove Clerk, implement native JWT + bcrypt, role-based auth |
 | **Milestone 2** | Product & Category Management + Cloudinary Integration | `Completed` | ✅ Completed | Admin CRUD, customer catalog, filters, search, Cloudinary uploads |
 | **Milestone 3** | Shopping Cart, Wishlist & Address Management | `Completed` | ✅ Completed | Guest/User cart sync, inventory validation, address CRUD & selector |
-| **Milestone 4** | Backend Order Validation, Simulated Payment Engine & Atomic Stock | `Pending Approval` | ⏳ Awaiting | Server-side price & stock check, simulated payment (Success/Failure), atomic decrement |
-| **Milestone 5** | Order Confirmation, Customer Tracking/Returns & Admin Dashboard | `Pending` | — | Order confirmation, customer order history, returns, admin order status & dashboard stats |
+| **Milestone 4** | Backend Order Validation, Simulated Payment Engine & Atomic Stock | `Completed` | ✅ Completed | Server-side price & stock check, simulated payment (Success/Failure), atomic decrement |
+| **Milestone 5** | Order Confirmation, Customer Tracking/Returns & Admin Dashboard | `Pending Approval` | ⏳ Awaiting | Order confirmation, customer order history, returns, admin order status & dashboard stats |
 | **Milestone 6** | End-to-End System Testing & Final Acceptance Verification | `Pending` | — | Full testing across all flows, payment edge cases, clean builds |
 
 ---
@@ -98,28 +98,30 @@ This document serves as the single source of truth for the project milestones, i
 ---
 
 ### Milestone 4: Backend Order Validation, Simulated Payment Engine & Atomic Stock Processing
-- **Status**: `Pending`
+- **Status**: `Completed`
 - **Scope & Objectives**:
-  - [ ] Server-Side Calculation & Validation:
-    - [ ] Recalculate all item prices, promo discounts, and total order amounts strictly on the backend using database prices.
-    - [ ] Verify product stock and active status before initiating order.
-    - [ ] Never trust frontend prices or totals.
-  - [ ] Simulated / Dummy Payment Implementation:
-    - [ ] Provide options for payment simulation: `Simulate Success` vs `Simulate Failure / Cancel`.
-    - [ ] Retain Razorpay credentials as optional future config without requiring active Razorpay credentials.
-  - [ ] Atomic Stock & Order State Handling:
-    - [ ] On Payment Success:
-      - [ ] Atomically decrement product inventory (e.g. `$inc: { stock: -qty }` with stock condition) to prevent overselling.
-      - [ ] Decrement promo usage count if applied.
-      - [ ] Set `paymentStatus = "paid"` and `orderStatus = "placed"`.
-      - [ ] Save payment transaction details in MongoDB.
-      - [ ] Clear customer cart items.
-    - [ ] On Payment Failure / Cancel:
-      - [ ] Mark payment as `failed`.
-      - [ ] Do NOT deduct inventory or decrement promo code.
-      - [ ] Retain customer cart items.
-      - [ ] Prevent duplicate payment processing.
-  - [ ] Independent lifecycle management for `paymentStatus` and `orderStatus`.
+  - [x] Server-Side Calculation & Validation:
+    - [x] Recalculate all item prices, promo discounts, and total order amounts strictly on the backend using database prices.
+    - [x] Verify product stock and active status before initiating order.
+    - [x] Never trust frontend prices or totals.
+  - [x] Simulated / Dummy Payment Implementation:
+    - [x] Provide options for payment simulation: `Simulate Success` vs `Simulate Failure / Cancel`.
+    - [x] Retain Razorpay credentials as optional future config without requiring active Razorpay credentials.
+    - [x] Payment simulation modal in client allowing testers/users to trigger success or failure outcomes.
+  - [x] Atomic Stock & Order State Handling:
+    - [x] On Payment Success:
+      - [x] Atomically decrement product inventory (e.g. `$inc: { stock: -qty }` with stock condition) to prevent overselling.
+      - [x] Decrement promo usage count if applied.
+      - [x] Set `paymentStatus = "paid"` and `orderStatus = "placed"`.
+      - [x] Award customer reward points (10% cashback in points).
+      - [x] Save payment transaction details in MongoDB.
+      - [x] Clear customer cart items.
+    - [x] On Payment Failure / Cancel:
+      - [x] Mark payment as `failed`.
+      - [x] Do NOT deduct inventory or decrement promo code.
+      - [x] Retain customer cart items.
+      - [x] Prevent duplicate payment processing.
+  - [x] Independent lifecycle management for `paymentStatus` and `orderStatus`.
 - **Milestone 4 Acceptance Criteria**:
   - Successful payments create a confirmed order, deduct stock atomically, and clear the cart.
   - Failed payments do not alter stock or empty the cart, and display appropriate error feedback.
@@ -171,4 +173,5 @@ This document serves as the single source of truth for the project milestones, i
 **Milestone 2 Completed**: Product & category management, Cloudinary integration, and search/filtering completed and verified.
 **UI Polish Committed** (`210a489`): Frontend aesthetic improvements — hero CTA overlay, product card hover effects + quick-view pill, rounded swatches, solid sale badge, sign-in/sign-up spacing fixes, Collections empty state icon. Pushed to `main`.
 **Milestone 3 Completed**: Shopping cart (CRUD, stock check, duplicate fix, guest sync, clear cart), wishlist, and customer address management (CRUD, checkout selector, real-time sync).
-**Currently Pending Approval**: `Milestone 4: Backend Order Validation, Simulated Payment Engine & Atomic Stock Processing`
+**Milestone 4 Completed**: Server-side price calculation, simulated payment engine (Success / Failure simulation modal), atomic inventory decrement, reward points, and cart clearing.
+**Currently Pending Approval**: `Milestone 5: Order Confirmation, Customer Tracking/Returns & Admin Dashboard`

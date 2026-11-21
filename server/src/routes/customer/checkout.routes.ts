@@ -165,11 +165,22 @@ customerCheckoutRouter.post(
 
     const totalAmount = Math.max(subTotal - discountAmount, 0);
 
-    const razorpayOrder = await razorpay.orders.create({
-      amount: toSubUnits(totalAmount),
-      currency: "INR",
-      receipt: `Order_${Date.now()}`,
-    });
+    let razorpayOrderId = `sim_order_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
+    let isRealRazorpay = false;
+
+    if (razorpay && process.env.RAZORPAY_KEY_ID && process.env.RAZORPAY_KEY_SECRET) {
+      try {
+        const razorpayOrder = await razorpay.orders.create({
+          amount: toSubUnits(totalAmount),
+          currency: "INR",
+          receipt: `Order_${Date.now()}`,
+        });
+        razorpayOrderId = razorpayOrder.id;
+        isRealRazorpay = true;
+      } catch (err) {
+        console.warn("Razorpay order creation failed, falling back to simulated payment:", err);
+      }
+    }
 
     const deliveryAddress = [
       selectedAddress.address,
@@ -192,16 +203,17 @@ customerCheckoutRouter.post(
       totalAmount,
       paymentStatus: "pending",
       orderStatus: "placed",
-      razorpayOrderId: razorpayOrder.id,
+      razorpayOrderId: razorpayOrderId,
     });
 
     res.json(
       ok({
+        mode: isRealRazorpay ? "razorpay" : "simulated",
         razorpay: {
-          keyId: process.env.RAZORPAY_KEY_ID,
-          orderId: razorpayOrder.id,
-          amount: razorpayOrder.amount,
-          currency: razorpayOrder.currency,
+          keyId: process.env.RAZORPAY_KEY_ID || "rzp_test_simulated",
+          orderId: razorpayOrderId,
+          amount: toSubUnits(totalAmount),
+          currency: "INR",
         },
         order: {
           _id: String(order._id),
@@ -209,6 +221,92 @@ customerCheckoutRouter.post(
           discountAmount,
           totalAmount,
         },
+      }),
+    );
+  }),
+);
+
+customerCheckoutRouter.post(
+  "/checkout/simulate-payment",
+  asyncHandler(async (req: Request, res: Response) => {
+    const dbUser = await getDbUserFromReq(req);
+    const orderId = String(req.body.orderId || "").trim();
+    const status = String(req.body.status || "").trim();
+
+    requireText(orderId, "Order id is required");
+    if (status !== "success" && status !== "failure") {
+      throw new AppError(400, "Status must be 'success' or 'failure'");
+    }
+
+    const order = await Order.findOne({ _id: orderId, user: dbUser._id });
+    const foundOrder = requireFound(order, "Order not found", 404);
+
+    if (foundOrder.paymentStatus === "paid") {
+      res.json(ok({ _id: String(foundOrder._id), paymentStatus: "paid" }));
+      return;
+    }
+
+    if (status === "failure") {
+      foundOrder.paymentStatus = "failed";
+      await foundOrder.save();
+      res.json(ok({ _id: String(foundOrder._id), paymentStatus: "failed" }));
+      return;
+    }
+
+    // Payment Success
+    // 1. Atomically decrement stock
+    for (const item of foundOrder.items) {
+      const updated = await Product.updateOne(
+        {
+          _id: item.product,
+          stock: { $gte: item.quantity },
+        },
+        {
+          $inc: { stock: -item.quantity },
+        },
+      );
+
+      if (!updated.matchedCount) {
+        throw new AppError(400, "One or more cart items are out of stock");
+      }
+    }
+
+    // 2. Decrement promo count
+    if (foundOrder.promoCode) {
+      await Promo.updateOne(
+        {
+          code: foundOrder.promoCode,
+          count: { $gt: 0 },
+        },
+        {
+          $inc: { count: -1 },
+        },
+      );
+    }
+
+    // 3. Increment reward points
+    const earnedPoints = Math.round(foundOrder.totalAmount * 0.1);
+    if (earnedPoints > 0) {
+      await User.updateOne(
+        { _id: dbUser._id },
+        { $inc: { points: earnedPoints } },
+      );
+    }
+
+    // 4. Clear cart
+    await Cart.updateOne({ user: dbUser._id }, { $set: { items: [] } });
+
+    // 5. Update order state
+    foundOrder.paymentStatus = "paid";
+    foundOrder.paymentId = `sim_pay_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
+    foundOrder.paidAt = new Date();
+    await foundOrder.save();
+
+    res.json(
+      ok({
+        _id: String(foundOrder._id),
+        paymentStatus: "paid",
+        earnedPoints,
       }),
     );
   }),
@@ -278,6 +376,14 @@ customerCheckoutRouter.post(
     }
 
     await Cart.updateOne({ user: dbUser._id }, { $set: { items: [] } });
+
+    const earnedPoints = Math.round(foundOrder.totalAmount * 0.1);
+    if (earnedPoints > 0) {
+      await User.updateOne(
+        { _id: dbUser._id },
+        { $inc: { points: earnedPoints } },
+      );
+    }
 
     foundOrder.paymentStatus = "paid";
     foundOrder.paymentId = razorpayPaymentId;

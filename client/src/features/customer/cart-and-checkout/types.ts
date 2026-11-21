@@ -43,6 +43,7 @@ export type AppliedPromo = {
 };
 
 export type CheckoutSessionResponse = {
+  mode?: "razorpay" | "simulated";
   razorpay: {
     keyId: string;
     orderId: string;
@@ -55,6 +56,12 @@ export type CheckoutSessionResponse = {
     discountAmount: number;
     totalAmount: number;
   };
+};
+
+export type SimulatePaymentResponse = {
+  _id: string;
+  paymentStatus: "paid" | "failed";
+  earnedPoints?: number;
 };
 
 export type CheckoutConfirmResponse = {
