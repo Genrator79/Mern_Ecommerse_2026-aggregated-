@@ -1,4 +1,9 @@
-export type AdminOrderStatus = "placed" | "shipped" | "delivered" | "returned";
+export type AdminOrderStatus =
+  | "placed"
+  | "shipped"
+  | "delivered"
+  | "returned"
+  | "cancelled";
 export type AdminPaymentStatus = "pending" | "paid" | "failed";
 
 export type AdminOrder = {

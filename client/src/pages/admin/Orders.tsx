@@ -52,6 +52,8 @@ const orderStatusOptions: AdminOrderStatus[] = [
   "placed",
   "shipped",
   "delivered",
+  "returned",
+  "cancelled",
 ];
 
 function formatDate(value?: string | null) {
@@ -70,16 +72,33 @@ function AdminPaymentStatusBadge(props: { status: AdminPaymentStatus }) {
   return <Badge className={className}>{status}</Badge>;
 }
 
+function AdminOrderStatusBadge(props: { status: AdminOrderStatus }) {
+  const { status } = props;
+  const className =
+    status === "delivered"
+      ? successBadgeClass
+      : status === "returned" || status === "cancelled"
+        ? dangerBadgeClass
+        : neutralBadgeClass;
+
+  return <Badge className={className}>{status}</Badge>;
+}
+
 function canUpdateStatus(order: AdminOrder) {
   if (order.paymentStatus !== "paid") return false;
   if (order.orderStatus === "delivered") return false;
   if (order.orderStatus === "returned") return false;
+  if (order.orderStatus === "cancelled") return false;
 
   return true;
 }
 
 function getNextStatusValue(order: AdminOrder) {
-  if (order.orderStatus === "delivered" || order.orderStatus === "returned")
+  if (
+    order.orderStatus === "delivered" ||
+    order.orderStatus === "returned" ||
+    order.orderStatus === "cancelled"
+  )
     return "";
 
   return order.orderStatus;
@@ -115,6 +134,7 @@ function AdminOrders() {
                     <TableHead>Items</TableHead>
                     <TableHead>Amount</TableHead>
                     <TableHead>Payment</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Paid at</TableHead>
                     <TableHead className="text-right">Update</TableHead>
                   </TableHeader>
@@ -136,6 +156,9 @@ function AdminOrders() {
                             <AdminPaymentStatusBadge
                               status={order.paymentStatus}
                             />
+                          </TableCell>
+                          <TableCell>
+                            <AdminOrderStatusBadge status={order.orderStatus} />
                           </TableCell>
 
                           <TableCell>
@@ -177,7 +200,9 @@ function AdminOrders() {
                                   ? "Payment not paid"
                                   : order.orderStatus === "returned"
                                     ? "Returned"
-                                    : "Completed"}
+                                    : order.orderStatus === "cancelled"
+                                      ? "Cancelled"
+                                      : "Completed"}
                               </span>
                             )}
                           </TableCell>

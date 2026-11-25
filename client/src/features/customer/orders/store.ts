@@ -1,6 +1,10 @@
 import { create } from "zustand";
 import type { CustomerOrder } from "./types";
-import { getCustomerOrders, returnCustomerOrder } from "./api";
+import {
+  cancelCustomerOrder,
+  getCustomerOrders,
+  returnCustomerOrder,
+} from "./api";
 import { toast } from "sonner";
 
 type CustomerOrdersStore = {
@@ -11,6 +15,7 @@ type CustomerOrdersStore = {
   closeOrders: () => void;
   loadOrders: () => Promise<void>;
   returnOrder: (orderId: string) => Promise<void>;
+  cancelOrder: (orderId: string) => Promise<void>;
   clear: () => void;
 };
 
@@ -58,8 +63,28 @@ export const useCustomerOrdersStore = create<CustomerOrdersStore>(
               : item,
           ),
         }));
+        toast.success("Order return requested successfully");
       } catch {
         toast.error("Failed to return order");
+      }
+    },
+    cancelOrder: async (orderId) => {
+      try {
+        const response = await cancelCustomerOrder(orderId);
+
+        set((state) => ({
+          items: state.items.map((item) =>
+            item._id === orderId
+              ? {
+                  ...item,
+                  orderStatus: response?.orderStatus ?? "cancelled",
+                }
+              : item,
+          ),
+        }));
+        toast.success("Order cancelled successfully");
+      } catch {
+        toast.error("Failed to cancel order");
       }
     },
   }),

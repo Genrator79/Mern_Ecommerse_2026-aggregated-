@@ -12,8 +12,8 @@ This document serves as the single source of truth for the project milestones, i
 | **Milestone 2** | Product & Category Management + Cloudinary Integration | `Completed` | ✅ Completed | Admin CRUD, customer catalog, filters, search, Cloudinary uploads |
 | **Milestone 3** | Shopping Cart, Wishlist & Address Management | `Completed` | ✅ Completed | Guest/User cart sync, inventory validation, address CRUD & selector |
 | **Milestone 4** | Backend Order Validation, Simulated Payment Engine & Atomic Stock | `Completed` | ✅ Completed | Server-side price & stock check, simulated payment (Success/Failure), atomic decrement |
-| **Milestone 5** | Order Confirmation, Customer Tracking/Returns & Admin Dashboard | `Pending Approval` | ⏳ Awaiting | Order confirmation, customer order history, returns, admin order status & dashboard stats |
-| **Milestone 6** | End-to-End System Testing & Final Acceptance Verification | `Pending` | — | Full testing across all flows, payment edge cases, clean builds |
+| **Milestone 5** | Order Confirmation, Customer Tracking/Returns & Admin Dashboard | `Completed` | ✅ Completed | Order confirmation, customer order history, returns/cancellation with stock restore, admin order status & dashboard stats |
+| **Milestone 6** | End-to-End System Testing & Final Acceptance Verification | `Pending Approval` | ⏳ Awaiting | Full testing across all flows, payment edge cases, clean builds |
 
 ---
 
@@ -129,18 +129,21 @@ This document serves as the single source of truth for the project milestones, i
 ---
 
 ### Milestone 5: Order Confirmation, Customer Tracking/Returns & Admin Dashboard
-- **Status**: `Pending`
+- **Status**: `Completed`
 - **Scope & Objectives**:
-  - [ ] Order Confirmation UI:
-    - [ ] Dedicated order confirmation screen showing order code, items, delivery details, and final amount.
-  - [ ] Customer Order History & Tracking:
-    - [ ] View list of previous orders with statuses (`placed`, `shipped`, `delivered`, `returned`, `cancelled`).
-    - [ ] Order return/cancellation functionality with automatic stock restoration.
-  - [ ] Admin Order Management:
-    - [ ] Order listing with customer details, item breakdown, and current payment/order statuses.
-    - [ ] Update order status (`placed` -> `shipped` -> `delivered` -> `returned`).
-  - [ ] Admin Dashboard Statistics:
-    - [ ] Metrics for total products, total categories, total orders, returned orders, and total sales (from paid orders).
+  - [x] Order Confirmation UI:
+    - [x] Dedicated order confirmation screen showing confirmation status, links to continue shopping, go to home, and view orders dialog.
+  - [x] Customer Order History & Tracking:
+    - [x] View list of previous orders with statuses (`placed`, `shipped`, `delivered`, `returned`, `cancelled`).
+    - [x] Populated order items breakdown in customer order history.
+    - [x] Order cancellation functionality for `placed` orders with automatic stock restoration and points refund.
+    - [x] Order return functionality for `delivered` orders within 7-day window with automatic stock restoration.
+  - [x] Admin Order Management:
+    - [x] Order listing with customer details, item breakdown, and current payment/order statuses.
+    - [x] Update order status (`placed` -> `shipped` -> `delivered` -> `returned` -> `cancelled`).
+    - [x] Stock restoration upon order return or cancellation.
+  - [x] Admin Dashboard Statistics:
+    - [x] Metrics for total products, total categories, total orders, returned orders, and total sales (from paid orders).
 - **Milestone 5 Acceptance Criteria**:
   - Customer can track orders and initiate returns/cancellations.
   - Admin can view orders, update statuses, and monitor dashboard sales analytics.
@@ -174,4 +177,5 @@ This document serves as the single source of truth for the project milestones, i
 **UI Polish Committed** (`210a489`): Frontend aesthetic improvements — hero CTA overlay, product card hover effects + quick-view pill, rounded swatches, solid sale badge, sign-in/sign-up spacing fixes, Collections empty state icon. Pushed to `main`.
 **Milestone 3 Completed**: Shopping cart (CRUD, stock check, duplicate fix, guest sync, clear cart), wishlist, and customer address management (CRUD, checkout selector, real-time sync).
 **Milestone 4 Completed**: Server-side price calculation, simulated payment engine (Success / Failure simulation modal), atomic inventory decrement, reward points, and cart clearing.
-**Currently Pending Approval**: `Milestone 5: Order Confirmation, Customer Tracking/Returns & Admin Dashboard`
+**Milestone 5 Completed**: Order confirmation UI, populated customer order history with cancellation and return workflows (with stock restoration and points refund), admin order status management (`placed` -> `shipped` -> `delivered` -> `returned` / `cancelled`), and admin dashboard metrics (`totalProducts`, `totalCategories`, `totalOrders`, `totalReturnedOrders`, `totalSales`). Verified via automated integration tests.
+**Currently Pending Approval**: `Milestone 6: End-to-End System Testing & Final Acceptance Verification`

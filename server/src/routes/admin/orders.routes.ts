@@ -13,6 +13,7 @@ const ALLOWED_ORDER_STATUSES = [
   "shipped",
   "delivered",
   "returned",
+  "cancelled",
 ] as const;
 
 type AdminOrderStatus = (typeof ALLOWED_ORDER_STATUSES)[number];
@@ -99,8 +100,27 @@ adminOrderRouter.patch(
       }
     }
 
+    if (
+      orderStatus === "cancelled" &&
+      foundOrder.orderStatus !== "cancelled" &&
+      foundOrder.orderStatus !== "returned"
+    ) {
+      for (const item of foundOrder.items) {
+        await Product.updateOne(
+          { _id: item.product },
+          {
+            $inc: { stock: item.quantity },
+          },
+        );
+      }
+    }
+
     if (orderStatus === "delivered" && !foundOrder.deliveredAt) {
       foundOrder.deliveredAt = new Date();
+    }
+
+    if (orderStatus === "returned" && !foundOrder.returnedAt) {
+      foundOrder.returnedAt = new Date();
     }
 
     foundOrder.orderStatus = orderStatus;

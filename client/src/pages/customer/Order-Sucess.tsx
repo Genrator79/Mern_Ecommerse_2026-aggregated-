@@ -2,6 +2,7 @@ import { CheckCircle2 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { Button } from "../../components/ui/button";
+import { useCustomerOrdersStore } from "../../features/customer/orders/store";
 
 const pageWrapClass =
   "flex min-h-screen items-center justify-center bg-background px-4";
@@ -15,6 +16,8 @@ const buttonRowClass = "flex flex-col gap-3 sm:flex-row sm:justify-center";
 const buttonClass = "rounded-none";
 
 export default function CustomerOrderSuccessPage() {
+  const openOrders = useCustomerOrdersStore((s) => s.openOrders);
+
   return (
     <div className={pageWrapClass}>
       <div className={cardClass}>
@@ -30,11 +33,19 @@ export default function CustomerOrderSuccessPage() {
         </div>
 
         <div className={buttonRowClass}>
-          <Button asChild className={buttonClass}>
-            <Link to="/collections">Continue shopping</Link>
+          <Button
+            type="button"
+            className={buttonClass}
+            onClick={() => void openOrders()}
+          >
+            View my orders
           </Button>
 
           <Button asChild variant="outline" className={buttonClass}>
+            <Link to="/collections">Continue shopping</Link>
+          </Button>
+
+          <Button asChild variant="ghost" className={buttonClass}>
             <Link to="/">Go to home</Link>
           </Button>
         </div>

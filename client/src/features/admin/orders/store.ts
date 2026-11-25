@@ -45,6 +45,7 @@ export const useAdminOrdersStore = create<AdminOrdersStore>((set) => ({
       }
 
       set((state) => ({
+        updatingOrderId: "",
         orders: state.orders.map((order) =>
           order._id === orderId
             ? {

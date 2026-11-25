@@ -1,7 +1,12 @@
 import mongoose, { HydratedDocument, model, Schema, Types } from "mongoose";
 
 export type PaymentStatus = "pending" | "paid" | "failed";
-export type OrderStatus = "placed" | "shipped" | "delivered" | "returned";
+export type OrderStatus =
+  | "placed"
+  | "shipped"
+  | "delivered"
+  | "returned"
+  | "cancelled";
 
 export type OrderItem = {
   product: Types.ObjectId;
@@ -108,7 +113,7 @@ const OrderSchema = new Schema<Order>(
     },
     orderStatus: {
       type: String,
-      enum: ["placed", "shipped", "delivered", "returned"],
+      enum: ["placed", "shipped", "delivered", "returned", "cancelled"],
       default: "placed",
     },
     razorpayOrderId: {

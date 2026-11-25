@@ -58,7 +58,7 @@ function CustomerOrderStatusBadge(props: { status: CustomerOrderStatus }) {
   const className =
     status === "delivered"
       ? successBadgeClass
-      : status === "returned"
+      : status === "returned" || status === "cancelled"
         ? dangerBadgeClass
         : neutralBadgeClass;
 
@@ -78,8 +78,15 @@ function canReturnOrder(order: CustomerOrder) {
 }
 
 function CustomerOrdersDialog() {
-  const { isOpen, closeOrders, loading, items, returnOrder, loadOrders } =
-    useCustomerOrdersStore((state) => state);
+  const {
+    isOpen,
+    closeOrders,
+    loading,
+    items,
+    returnOrder,
+    cancelOrder,
+    loadOrders,
+  } = useCustomerOrdersStore((state) => state);
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && closeOrders()}>
@@ -122,8 +129,31 @@ function CustomerOrdersDialog() {
               <TableBody>
                 {items.map((order) => (
                   <TableRow key={order._id}>
-                    <TableCell className="font-medium">{order._id}</TableCell>
-                    <TableCell>{order.totalItems}</TableCell>
+                    <TableCell className="font-medium">
+                      <div>
+                        <span>{order.code || order._id.slice(-8).toUpperCase()}</span>
+                        <p className="text-[11px] text-muted-foreground font-normal">
+                          {order._id}
+                        </p>
+                      </div>
+                    </TableCell>
+                    <TableCell>
+                      <div>
+                        <span>{order.totalItems} {order.totalItems === 1 ? "item" : "items"}</span>
+                        {order.items && order.items.length > 0 && (
+                          <p className="text-xs text-muted-foreground truncate max-w-[160px]">
+                            {order.items
+                              .map((it) =>
+                                typeof it.product === "object" && it.product?.title
+                                  ? `${it.product.title} (x${it.quantity})`
+                                  : "",
+                              )
+                              .filter(Boolean)
+                              .join(", ")}
+                          </p>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>{formatPrice(order.totalAmount)}</TableCell>
                     <TableCell>
                       <CustomerPaymentStatusBadge
@@ -140,14 +170,32 @@ function CustomerOrdersDialog() {
                       {canReturnOrder(order) ? (
                         <Button
                           size="sm"
+                          variant="outline"
                           className="rounded-none"
                           onClick={() => returnOrder(order._id)}
                         >
                           Return
                         </Button>
+                      ) : order.orderStatus === "placed" ? (
+                        <Button
+                          size="sm"
+                          variant="destructive"
+                          className="rounded-none"
+                          onClick={() => cancelOrder(order._id)}
+                        >
+                          Cancel
+                        </Button>
                       ) : (
                         <span className="text-xs text-muted-foreground">
-                          {order.orderStatus === "returned" ? "Returned" : ""}
+                          {order.orderStatus === "returned"
+                            ? "Returned"
+                            : order.orderStatus === "cancelled"
+                              ? "Cancelled"
+                              : order.orderStatus === "shipped"
+                                ? "Shipped"
+                                : order.orderStatus === "delivered"
+                                  ? "Delivered"
+                                  : ""}
                         </span>
                       )}
                     </TableCell>

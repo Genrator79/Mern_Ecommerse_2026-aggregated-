@@ -11,6 +11,16 @@ import { User } from "../../models/User";
 
 type CustomerOrderRow = {
   _id: Types.ObjectId;
+  items: Array<{
+    product: Types.ObjectId | {
+      _id: Types.ObjectId;
+      title: string;
+      brand?: string;
+      images?: string[];
+      price?: number;
+    };
+    quantity: number;
+  }>;
   totalItems: number;
   totalAmount: number;
   paymentStatus: PaymentStatus;
@@ -31,8 +41,9 @@ customerOrderRouter.get(
     const dbUser = await getDbUserFromReq(req);
 
     const orders = await Order.find({ user: dbUser._id })
+      .populate("items.product", "title brand images price")
       .select(
-        "totalItems totalAmount paymentStatus orderStatus  paidAt deliveredAt returnedAt createdAt",
+        "items totalItems totalAmount paymentStatus orderStatus paidAt deliveredAt returnedAt createdAt",
       )
       .sort({ createdAt: -1 })
       .lean<CustomerOrderRow[]>();
@@ -42,6 +53,7 @@ customerOrderRouter.get(
         items: orders.map((orderItem) => ({
           _id: String(orderItem._id),
           code: String(orderItem._id).slice(-8).toUpperCase(),
+          items: orderItem.items,
           totalItems: orderItem.totalItems,
           totalAmount: orderItem.totalAmount,
           paymentStatus: orderItem.paymentStatus,
@@ -51,6 +63,47 @@ customerOrderRouter.get(
           returnedAt: orderItem.returnedAt,
           createdAt: orderItem.createdAt,
         })),
+      }),
+    );
+  }),
+);
+
+customerOrderRouter.patch(
+  "/orders/:orderId/cancel",
+  asyncHandler(async (req: Request, res: Response) => {
+    const dbUser = await getDbUserFromReq(req);
+    const orderId = String(req.params.orderId || "").trim();
+
+    requireText(orderId, "Order Id is required");
+
+    const order = await Order.findOne({ _id: orderId, user: dbUser._id });
+    const foundOrder = requireFound(order, "Order not found", 404);
+
+    if (foundOrder.orderStatus !== "placed") {
+      throw new AppError(400, "Only placed orders can be cancelled");
+    }
+
+    for (const item of foundOrder.items) {
+      await Product.updateOne(
+        { _id: item.product },
+        { $inc: { stock: item.quantity } },
+      );
+    }
+
+    if (foundOrder.paymentStatus === "paid") {
+      await User.updateOne(
+        { _id: dbUser._id },
+        { $inc: { points: foundOrder.totalAmount } },
+      );
+    }
+
+    foundOrder.orderStatus = "cancelled";
+    await foundOrder.save();
+
+    res.json(
+      ok({
+        _id: String(foundOrder._id),
+        orderStatus: foundOrder.orderStatus,
       }),
     );
   }),
