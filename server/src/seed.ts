@@ -5,6 +5,7 @@ import { User } from "./models/User";
 import { Category } from "./models/Category";
 import { Product } from "./models/Product";
 import { Promo } from "./models/Promo";
+import { Banner } from "./models/Banner";
 
 dotenv.config();
 
@@ -20,10 +21,11 @@ async function seed() {
   console.log("✅ Connected to MongoDB");
 
   // 1. CLEAR EXISTING DATA (Except preserved user data if needed, but here we reset clean)
-  console.log("🧹 Cleaning old categories, products, and promos...");
+  console.log("🧹 Cleaning old categories, products, banners, and promos...");
   await Category.deleteMany({});
   await Product.deleteMany({});
   await Promo.deleteMany({});
+  await Banner.deleteMany({});
 
   // 2. SEED / UPDATE DEMO USERS
   console.log("👤 Setting up Admin and Customer accounts...");
@@ -84,7 +86,33 @@ async function seed() {
   const adminUser = await User.findOne({ email: "abhijeet2026@gmail.com" });
   const adminId = adminUser?._id;
 
-  // 4. SEED PRODUCTS (Realistic, high-res multi-image fashion items)
+  // 4. SEED BANNERS (Hero & Side Promo Banners)
+  console.log("🖼️ Seeding Hero & Side Banners...");
+  const bannersData = [
+    {
+      imageUrl:
+        "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=1600&auto=format&fit=crop&q=85",
+      imagePublicId: "seed_hero_banner_1",
+      createdBy: adminId,
+    },
+    {
+      imageUrl:
+        "https://images.unsplash.com/photo-1445205170230-053b83016050?w=1000&auto=format&fit=crop&q=85",
+      imagePublicId: "seed_side_banner_1",
+      createdBy: adminId,
+    },
+    {
+      imageUrl:
+        "https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=1000&auto=format&fit=crop&q=85",
+      imagePublicId: "seed_side_banner_2",
+      createdBy: adminId,
+    },
+  ];
+
+  await Banner.insertMany(bannersData);
+  console.log(`✅ Seeded ${bannersData.length} promotional banners`);
+
+  // 5. SEED PRODUCTS (Realistic, high-res multi-image fashion items)
   console.log("👕 Seeding Products with multiple images, sizes, and colors...");
 
   const productsData = [
