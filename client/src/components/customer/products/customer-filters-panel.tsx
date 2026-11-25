@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { SIZE_OPTIONS } from "@/features/admin/products/constants";
@@ -61,6 +62,35 @@ function CustomerFiltersPanel({
   onClearFilters,
   onToggleFacet,
 }: CustomerFiltersPanelProps) {
+  // Deduplicate and filter out categories containing numbers or test timestamps
+  const cleanCategories = useMemo(() => {
+    const seen = new Map<string, ProductCategory>();
+    for (const cat of categories) {
+      if (!cat?.name) continue;
+      const cleanName = cat.name.trim();
+      // Filter out automated test categories with trailing timestamps or numbers
+      if (/\d{4,}/.test(cleanName)) continue;
+      const key = cleanName.toLowerCase();
+      if (!seen.has(key)) {
+        seen.set(key, { ...cat, name: cleanName });
+      }
+    }
+    return Array.from(seen.values()).sort((a, b) =>
+      a.name.localeCompare(b.name),
+    );
+  }, [categories]);
+
+  const cleanColors = useMemo(() => {
+    const set = new Set<string>();
+    for (const c of availableColors) {
+      const trimmed = (c || "").trim();
+      if (trimmed && !/\d{4,}/.test(trimmed)) {
+        set.add(trimmed);
+      }
+    }
+    return Array.from(set).sort();
+  }, [availableColors]);
+
   return (
     <div className={panelWrapClass}>
       <div className={panelHeaderClass}>
@@ -84,7 +114,7 @@ function CustomerFiltersPanel({
         <h3 className={sectionTitleClass}>Categories</h3>
 
         <div className={stackedOptionsClass}>
-          {categories.map((item) => {
+          {cleanCategories.map((item) => {
             const isActive = filters.category === item._id;
 
             return (
@@ -128,24 +158,27 @@ function CustomerFiltersPanel({
       <section className={sectionClass}>
         <h3 className={sectionTitleClass}>Colors</h3>
         <div className={colorsWrapClass}>
-          {availableColors.map((color) => {
+          {cleanColors.map((color) => {
             const isActive = filters.color === color;
 
             return (
               <button
                 key={color}
                 type="button"
+                title={color}
+                aria-label={color}
                 className={`${colorButtonBaseClass} ${
                   isActive ? colorButtonActiveClass : ""
-                }`}
+                } cursor-pointer hover:opacity-90`}
                 onClick={() => onToggleFacet("color", color)}
               >
                 <span
-                  className={`${colorSwatchBaseClass} ${
+                  className={`${colorSwatchBaseClass} rounded-full ${
                     isActive ? colorSwatchActiveClass : colorSwatchInactiveClass
                   }`}
                   style={{ backgroundColor: getSwatchColor(color) }}
                 />
+                <span className="text-[11px] font-medium">{color}</span>
               </button>
             );
           })}

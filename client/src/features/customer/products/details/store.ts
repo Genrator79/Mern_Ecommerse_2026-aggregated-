@@ -25,6 +25,7 @@ type CustomerProductDetailsStore = {
     isLoaded: boolean,
     isBootstrapped: boolean,
     isSignedIn: boolean,
+    quantity?: number,
   ) => Promise<void>;
   toggleWishlist: (
     isLoaded: boolean,
@@ -122,13 +123,13 @@ export const useCustomerProductDetailsStore =
         toast.error("Failed to toggle wishlist items");
       }
     },
-    addToCart: async (isLoaded, isBootatraped, isSignedIn) => {
-      const { data, selectedColor, selectedSize } = get();
+    addToCart: async (isLoaded, isBootstrapped, isSignedIn, quantity = 1) => {
+      const { data, selectedColor, selectedSize, selectedImage } = get();
       const product = data?.product ?? null;
 
       if (!product || product.stock < 1) return;
 
-      if (!isLoaded || !isBootatraped) {
+      if (!isLoaded || !isBootstrapped) {
         toast.error("Try again");
         return;
       }
@@ -136,14 +137,16 @@ export const useCustomerProductDetailsStore =
       await useCustomerCartAndCheckoutStore.getState().addItem(
         {
           productId: product._id,
-          quantity: 1,
+          quantity: quantity > 0 ? quantity : 1,
           color: selectedColor || undefined,
           size: selectedSize || undefined,
           title: product.title,
           brand: product.brand,
-          image: getCoverImage(product),
+          image: selectedImage || getCoverImage(product),
           finalPrice: product.salePercentage
-            ? product.price - (product.price * product.salePercentage) / 100
+            ? Math.round(
+                product.price - (product.price * product.salePercentage) / 100,
+              )
             : product.price,
         },
         isSignedIn,

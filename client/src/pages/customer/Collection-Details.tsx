@@ -85,32 +85,36 @@ function CollectionDetails() {
       </section>
 
       <div className={contentContainerClass}>
-        <div className={contentGridClass}>
-          <CustomerProductDetailsGallery
-            product={product}
-            selectedImage={selectedImage}
-            setSelectedImage={setSelectedImage}
-          />
+        <div className="grid gap-10 lg:grid-cols-12 lg:items-start">
+          <div className="lg:col-span-7">
+            <CustomerProductDetailsGallery
+              product={product}
+              selectedImage={selectedImage}
+              setSelectedImage={setSelectedImage}
+            />
+          </div>
 
-          <CustomerProductDetailsSummary
-            product={product}
-            selectedColor={selectedColor}
-            selectedSize={selectedSize}
-            setSelectedColor={setSelectedColor}
-            setSelectedSize={setSelectedSize}
-            toggleWishlist={() =>
-              toggleWishlist(
-                isLoaded,
-                isBootstrapped,
-                Boolean(isSignedIn),
-                isWishlistActive,
-              )
-            }
-            isWishlistActive={isWishlistActive}
-            onAddToCart={() =>
-              addToCart(isLoaded, isBootstrapped, Boolean(isSignedIn))
-            }
-          />
+          <div className="lg:col-span-5 lg:sticky lg:top-24">
+            <CustomerProductDetailsSummary
+              product={product}
+              selectedColor={selectedColor}
+              selectedSize={selectedSize}
+              setSelectedColor={setSelectedColor}
+              setSelectedSize={setSelectedSize}
+              toggleWishlist={() =>
+                toggleWishlist(
+                  isLoaded,
+                  isBootstrapped,
+                  Boolean(isSignedIn),
+                  isWishlistActive,
+                )
+              }
+              isWishlistActive={isWishlistActive}
+              onAddToCart={(qty) =>
+                addToCart(isLoaded, isBootstrapped, Boolean(isSignedIn), qty)
+              }
+            />
+          </div>
         </div>
 
         {relatedProducts.length ? (

@@ -53,8 +53,8 @@ export type ActiveFilterBadge = {
 
 export function getCoverImage(product: CustomerProduct) {
   return (
-    product.images.find((item) => item.isCover)?.url ||
-    product.images[0].url ||
+    product?.images?.find((item) => item.isCover)?.url ||
+    product?.images?.[0]?.url ||
     ""
   );
 }
