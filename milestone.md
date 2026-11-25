@@ -13,7 +13,7 @@ This document serves as the single source of truth for the project milestones, i
 | **Milestone 3** | Shopping Cart, Wishlist & Address Management | `Completed` | ✅ Completed | Guest/User cart sync, inventory validation, address CRUD & selector |
 | **Milestone 4** | Backend Order Validation, Simulated Payment Engine & Atomic Stock | `Completed` | ✅ Completed | Server-side price & stock check, simulated payment (Success/Failure), atomic decrement |
 | **Milestone 5** | Order Confirmation, Customer Tracking/Returns & Admin Dashboard | `Completed` | ✅ Completed | Order confirmation, customer order history, returns/cancellation with stock restore, admin order status & dashboard stats |
-| **Milestone 6** | End-to-End System Testing & Final Acceptance Verification | `Pending Approval` | ⏳ Awaiting | Full testing across all flows, payment edge cases, clean builds |
+| **Milestone 6** | End-to-End System Testing & Final Acceptance Verification | `Completed` | ✅ Completed | Full testing across all flows, payment edge cases, clean builds |
 
 ---
 
@@ -151,19 +151,22 @@ This document serves as the single source of truth for the project milestones, i
 ---
 
 ### Milestone 6: End-to-End System Testing & Final Acceptance Verification
-- **Status**: `Pending`
+- **Status**: `Completed`
 - **Scope & Objectives**:
-  - [ ] Verify complete e-commerce journey:
-    - [ ] Admin creates product with image upload and stock.
-    - [ ] Customer registers/logs in.
-    - [ ] Customer browses products, filters, searches, and adds to cart.
-    - [ ] Customer proceeds to checkout with delivery address.
-    - [ ] Test simulated failed payment -> Verify proper error, cart intact, stock unchanged.
-    - [ ] Test simulated successful payment -> Verify order confirmed, stock deducted, cart cleared.
-    - [ ] Customer views order in order history.
-    - [ ] Admin updates order status in Admin Orders view.
-    - [ ] Admin verifies dashboard sales metrics increase.
-  - [ ] Final security, code cleanup, and TypeScript compilation audit across server and client.
+  - [x] Verify complete e-commerce journey:
+    - [x] Admin creates product with image upload and stock.
+    - [x] Customer registers/logs in.
+    - [x] Customer browses products, filters, searches, and adds to cart.
+    - [x] Customer proceeds to checkout with delivery address.
+    - [x] Test simulated failed payment -> Verify proper error, cart intact, stock unchanged.
+    - [x] Test simulated successful payment -> Verify order confirmed, stock deducted, cart cleared.
+    - [x] Customer views order in order history.
+    - [x] Admin updates order status in Admin Orders view (`placed` -> `shipped` -> `delivered`).
+    - [x] Admin verifies dashboard sales metrics increase.
+    - [x] Customer returns delivered order -> Verify stock restored and points refunded.
+    - [x] Customer cancels placed order -> Verify stock restored immediately.
+  - [x] Final security, code cleanup, and TypeScript compilation audit across server and client (`0` errors).
+  - [x] Production build validation (`npm run build` succeeds cleanly).
 - **Milestone 6 Acceptance Criteria**:
   - Complete end-to-end journey works without errors.
   - All acceptance criteria satisfied.
@@ -172,10 +175,11 @@ This document serves as the single source of truth for the project milestones, i
 
 ## Current Execution Focus
 
-**Milestone 1 Completed**: Native authentication system successfully migrated and verified.
-**Milestone 2 Completed**: Product & category management, Cloudinary integration, and search/filtering completed and verified.
-**UI Polish Committed** (`210a489`): Frontend aesthetic improvements — hero CTA overlay, product card hover effects + quick-view pill, rounded swatches, solid sale badge, sign-in/sign-up spacing fixes, Collections empty state icon. Pushed to `main`.
-**Milestone 3 Completed**: Shopping cart (CRUD, stock check, duplicate fix, guest sync, clear cart), wishlist, and customer address management (CRUD, checkout selector, real-time sync).
-**Milestone 4 Completed**: Server-side price calculation, simulated payment engine (Success / Failure simulation modal), atomic inventory decrement, reward points, and cart clearing.
-**Milestone 5 Completed**: Order confirmation UI, populated customer order history with cancellation and return workflows (with stock restoration and points refund), admin order status management (`placed` -> `shipped` -> `delivered` -> `returned` / `cancelled`), and admin dashboard metrics (`totalProducts`, `totalCategories`, `totalOrders`, `totalReturnedOrders`, `totalSales`). Verified via automated integration tests.
-**Currently Pending Approval**: `Milestone 6: End-to-End System Testing & Final Acceptance Verification`
+**All 6 Milestones Completed & Verified**:
+1. **Milestone 1**: Native authentication system successfully migrated and verified (JWT + bcrypt, role-based auth, Clerk removed).
+2. **Milestone 2**: Product & category management, Cloudinary integration, catalog search, and filtering completed and verified.
+3. **UI Polish Committed** (`210a489`): Frontend aesthetic improvements across hero CTA overlay, product cards, swatches, sale badges, and empty states.
+4. **Milestone 3**: Shopping cart (CRUD, stock check, duplicate prevention, guest sync, clear cart), wishlist, and customer address management (CRUD, checkout selector, real-time sync).
+5. **Milestone 4**: Server-side price calculation, simulated payment engine (Success / Failure simulation modal), atomic inventory decrement, reward points, and cart clearing.
+6. **Milestone 5**: Order confirmation UI, populated customer order history with cancellation and return workflows (with stock restoration and points refund), admin order status management, and admin dashboard metrics.
+7. **Milestone 6**: End-to-end automated system testing suite verifying full admin and customer lifecycle (catalog creation -> search -> cart -> payment failure isolation -> payment success atomic decrement -> cancellation -> delivery -> return -> dashboard metrics -> cleanup). Clean TypeScript audit and production build. Project 100% complete.
